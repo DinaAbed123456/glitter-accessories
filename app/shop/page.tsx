@@ -1,0 +1,16 @@
+import Link from "next/link";
+import { getCategories, getProducts } from "@/lib/store";
+
+type SearchParams = Promise<Record<string, string | string[] | undefined>>;
+export default async function ShopPage({ searchParams }: { searchParams: SearchParams }) {
+  const params = await searchParams;
+  const first = (key: string) => typeof params[key] === "string" ? params[key] as string : "";
+  const query = first("q");
+  const category = first("category");
+  const sort = first("sort");
+  const [categories, products] = await Promise.all([getCategories(), getProducts({ query, category, sort, offers: first("offers") === "true" || !!first("offer"), available: first("available") === "true", minPrice: Number(first("min")) || undefined, maxPrice: Number(first("max")) || undefined })]);
+  return <main dir="rtl" className="min-h-screen bg-[#fffdfc] text-[#201d1c]"><header className="border-b border-black/10 px-6 py-6"><Link href="/" className="font-serif text-2xl">Glitter</Link><nav className="mt-3 flex gap-5 text-xs"><Link href="/">الرئيسية</Link><Link href="/cart">السلة</Link><Link href="/account">حسابي</Link></nav></header><div className="mx-auto max-w-[1440px] px-5 py-12 lg:px-10"><p className="mb-2 text-xs tracking-[.2em] text-[#b98b8f]">GLITTER COLLECTION</p><h1 className="mb-8 text-3xl font-light">{first("offers")==="true" || first("offer") ? "العروض" : "المتجر"}</h1>
+    <form className="mb-9 grid gap-3 border border-black/10 bg-white p-4 md:grid-cols-6"><input name="q" defaultValue={query} placeholder="ابحثي عن قطعة..." className="border border-black/10 p-3 text-xs md:col-span-2"/><select name="category" defaultValue={category} className="border border-black/10 bg-white p-3 text-xs"><option value="">جميع الفئات</option>{categories.map((item)=><option value={item.id} key={item.id}>{item.name}</option>)}</select><select name="sort" defaultValue={sort} className="border border-black/10 bg-white p-3 text-xs"><option value="">الأحدث والمميز</option><option value="price-asc">السعر: الأقل أولًا</option><option value="price-desc">السعر: الأعلى أولًا</option><option value="new">الأحدث</option></select><input type="number" name="min" min="0" placeholder="أقل سعر ₪" className="border border-black/10 p-3 text-xs"/><input type="number" name="max" min="0" placeholder="أعلى سعر ₪" className="border border-black/10 p-3 text-xs"/><label className="flex items-center gap-2 text-xs"><input type="checkbox" name="available" value="true" defaultChecked={first("available")==="true"}/>متوفر</label><button className="bg-[#211e1c] p-3 text-xs text-white">تطبيق الفلاتر</button></form>
+    {products.length ? <div className="grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-4 md:gap-6">{products.map((p)=><article key={p.id}><Link href={`/product/${p.id}`} className="block aspect-[.79] overflow-hidden bg-[#f7f3f1]">{p.image_url&&<img src={p.image_url} alt={p.name} className="h-full w-full object-cover"/>}</Link><Link href={`/product/${p.id}`} className="mt-4 block text-center text-sm">{p.name}</Link><p className="mt-2 text-center text-sm font-semibold">{p.price} ₪ {p.old_price&&<del className="mr-2 text-xs text-black/40">{p.old_price} ₪</del>}</p></article>)}</div>:<p className="py-20 text-center text-sm text-black/50">لم نعثر على منتجات تطابق اختياراتك.</p>}
+  </div></main>;
+}

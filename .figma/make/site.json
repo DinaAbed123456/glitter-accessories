@@ -1,0 +1,10 @@
+{
+  "description": "Glitter Accessories offers a luxurious online shopping experience for women's accessories, featuring elegant designs, easy navigation, and exclusive deals.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}

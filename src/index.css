@@ -1,0 +1,93 @@
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,500;1,500&display=swap");
+@import "tailwindcss";
+
+:root {
+  font-family: "IBM Plex Sans Arabic", sans-serif;
+  color: #201d1c;
+  background: #fffdfc;
+  font-synthesis: none;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+}
+
+button,
+a,
+input {
+  font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  cursor: pointer;
+}
+
+.font-serif {
+  font-family: "Playfair Display", serif;
+}
+
+.logo {
+  position: relative;
+  display: flex;
+  width: max-content;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+}
+
+.logo-mark {
+  position: absolute;
+  top: -9px;
+  right: -14px;
+  color: #c59296;
+}
+
+.nav-link {
+  position: relative;
+  padding-block: 31px;
+  white-space: nowrap;
+}
+
+.nav-link::after {
+  position: absolute;
+  right: 0;
+  bottom: 23px;
+  width: 0;
+  height: 1px;
+  content: "";
+  background: #be8c90;
+  transition: width 250ms ease;
+}
+
+.nav-link:hover::after,
+.nav-link.active::after {
+  width: 100%;
+}
+
+@media (max-width: 640px) {
+  .logo .font-serif {
+    font-size: 23px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
