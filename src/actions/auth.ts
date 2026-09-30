@@ -50,25 +50,30 @@ export async function signUp(input: unknown) {
       password: parsed.data.password,
       options: { data: { full_name: parsed.data.name } },
     });
-    if (!error) return { ok: true as const, confirmationRequired: !data.session };
-    const message = error.message.toLowerCase();
-    if (error.status === 429) return { ok: false as const, error: "محاولات كثيرة. انتظر قليلًا ثم حاول مجددًا." };
-    if (message.includes("invalid api key") || error.code === "invalid_api_key") {
-      return { ok: false as const, error: "مفتاح Supabase غير صالح. راجع قيمة NEXT_PUBLIC_SUPABASE_ANON_KEY في إعدادات Vercel." };
+    if (error) {
+      console.error("[auth.signUp] Supabase Auth error", {
+        name: error.name,
+        message: error.message,
+        code: error.code,
+        status: error.status,
+        userExists: Boolean(data.user),
+        sessionExists: Boolean(data.session),
+      });
+      return { ok: false as const, error: error.message };
     }
-    if (message.includes("database error saving new user")) {
-      return { ok: false as const, error: "رفضت قاعدة البيانات إنشاء المستخدم. تحقق من trigger إنشاء الملف الشخصي وتطبيق migration الأساسي في مشروع Supabase المتصل." };
-    }
-    if (message.includes("signup is disabled") || message.includes("signups not allowed")) {
-      return { ok: false as const, error: "إنشاء الحسابات بالبريد معطّل في إعدادات Supabase Authentication." };
-    }
-    if (message.includes("already registered") || message.includes("already been registered")) {
-      return { ok: false as const, error: "هذا البريد مسجل مسبقًا. جرّب تسجيل الدخول أو استعادة كلمة المرور." };
-    }
-    if (message.includes("password")) return { ok: false as const, error: "كلمة المرور لا تحقق متطلبات الأمان المحددة في Supabase." };
-    return { ok: false as const, error: "رفض Supabase إنشاء الحساب. راجع إعدادات Auth ومشروع Supabase المرتبط بهذا الموقع." };
-  } catch {
-    return { ok: false as const, error: "تعذر الاتصال بخدمة الحسابات. تحقق من إعدادات Supabase واتصال الإنترنت." };
+    return { ok: true as const, confirmationRequired: !data.session };
+  } catch (caught) {
+    const thrown = caught instanceof Error ? caught : new Error("Unknown signup error");
+    const details = typeof caught === "object" && caught !== null
+      ? caught as { code?: unknown; status?: unknown }
+      : {};
+    console.error("[auth.signUp] Unexpected signup exception", {
+      name: thrown.name,
+      message: thrown.message,
+      code: details.code,
+      status: details.status,
+    });
+    return { ok: false as const, error: thrown.message };
   }
 }
 export async function sendPasswordReset(input: unknown) {
