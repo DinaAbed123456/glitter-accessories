@@ -29,7 +29,7 @@ export default function AuthForm({ mode, admin = false }: { mode: "login" | "reg
         const role = await getAdminRole();
         if (admin && !role) {
           await signOut();
-          setError("??? ?????? ?? ???? ?????? ???? ???? ???????.");
+          setError("هذا الحساب لا يملك صلاحية دخول لوحة الإدارة.");
           return;
         }
         router.replace(role ? "/admin" : "/account");
